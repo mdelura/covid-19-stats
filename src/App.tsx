@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import './App.css';
 import DataService from './services/DataService';
 import Spinner from './components/Spinner';
 import Charts from './components/Charts';
 import DataResult from './models/DataResult';
 import CenteredContent from './components/CenteredContent';
+import Container from '@material-ui/core/Container';
+import Box from '@material-ui/core/Box';
 
 const App: React.SFC = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -28,9 +29,11 @@ const App: React.SFC = () => {
     if (!data) return <CenteredContent>Failed to load data</CenteredContent>;
 
     return (
-        <div className="App">
-            <Charts data={data} />
-        </div>
+        <Container>
+            <Box style={{ marginTop: 15 }}>
+                <Charts data={data} />
+            </Box>
+        </Container>
     );
 };
 
