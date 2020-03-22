@@ -1,6 +1,6 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
-import DataService from '../services/DataService';
+import ResultReader from '../services/ResultReader';
 import DataResult from '../models/DataResult';
 
 export interface ChartsProps {
@@ -10,20 +10,35 @@ export interface ChartsProps {
 const Charts: React.SFC<ChartsProps> = ({ data }) => {
     const selectedData = data.find(i => i['Country/Region'] === 'Poland') || ({} as DataResult);
 
-    const getChartOptions = () => ({
-        xaxis: { categories: DataService.getDaysFromDayOne(selectedData) }
+    //TODO Add selects for State & Country
+
+    const getChartOptions = (categories: string[]) => ({
+        xaxis: { categories }
     });
 
-    const getChartSeries = () => [
+    const getChartSeries = (values: number[]) => [
         {
             name: selectedData['Country/Region'],
-            data: DataService.getValuesFromDayOne(selectedData)
+            data: values
         }
     ];
 
     return (
         <React.Fragment>
-            <Chart options={getChartOptions()} series={getChartSeries()} type="line" />
+            {/* TODO Add legend, set buttons */}
+
+            <Chart
+                options={getChartOptions(ResultReader.getDays(selectedData))}
+                series={getChartSeries(ResultReader.getValues(selectedData))}
+                type="line"
+            />
+            <Chart
+                options={getChartOptions(ResultReader.getDaysFromDayOne(selectedData))}
+                series={getChartSeries(ResultReader.getValuesFromDayOne(selectedData))}
+                type="line"
+            />
+            {/* TODO Add Chart with 'since day 1'*/}
+            {/* TODO Add Stats + ests*/}
         </React.Fragment>
     );
 };
