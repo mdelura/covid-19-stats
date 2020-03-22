@@ -21,7 +21,7 @@ const App: React.SFC = () => {
     if (isLoading)
         return (
             <CenteredContent>
-                <Spinner />
+                <Spinner message="Loading data..." />
             </CenteredContent>
         );
 

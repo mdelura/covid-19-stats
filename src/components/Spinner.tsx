@@ -1,4 +1,6 @@
 import * as React from 'react';
+import CircularProgress from '@material-ui/core/CircularProgress';
+import { Typography, Box } from '@material-ui/core';
 
 export interface SpinnerProps {
     message?: string;
@@ -7,10 +9,10 @@ export interface SpinnerProps {
 const Spinner: React.SFC<SpinnerProps> = ({ message }) => {
     return (
         <React.Fragment>
-            <div className="spinner-border text-primary" role="status">
-                <span className="sr-only">Loading...</span>
-            </div>
-            {!!message && <p>{message}</p>}
+            <Box display="flex" flexDirection="column" alignItems="center">
+                <CircularProgress />
+                <Typography style={{ marginTop: 5 }}>{message}</Typography>
+            </Box>
         </React.Fragment>
     );
 };
