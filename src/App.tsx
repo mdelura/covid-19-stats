@@ -1,32 +1,37 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import Chart from 'react-apexcharts';
 import DataService from './services/DataService';
+import Spinner from './components/Spinner';
+import Charts from './components/Charts';
+import DataResult from './models/DataResult';
+import CenteredContent from './components/CenteredContent';
 
-function App() {
-    const getChartOptions = () => ({
-        xaxis: { categories: DataService.getDaysFromDayOne(selectedData) }
-    });
-
-    const getChartSeries = () => [
-        {
-            name: 'series-1',
-            data: DataService.getValuesFromDayOne(selectedData)
-        }
-    ];
-
-    const [data, setData] = useState<any | undefined>(undefined);
-    const [selectedData, setSelectedData] = useState<any | undefined>(undefined);
+const App: React.SFC = () => {
+    const [isLoading, setIsLoading] = useState(true);
+    const [data, setData] = useState<DataResult[] | undefined>(undefined);
 
     useEffect(() => {
         DataService.getData().then(data => {
             if (!data) return;
             setData(data);
-            setSelectedData(data.find(i => i['Country/Region'] === 'Poland'));
+            setIsLoading(false);
         });
     }, []);
 
-    return <div className="App">{selectedData && <Chart options={getChartOptions()} series={getChartSeries()} type="line" />}</div>;
-}
+    if (isLoading)
+        return (
+            <CenteredContent>
+                <Spinner />
+            </CenteredContent>
+        );
+
+    if (!data) return <CenteredContent>Failed to load data</CenteredContent>;
+
+    return (
+        <div className="App">
+            <Charts data={data} />
+        </div>
+    );
+};
 
 export default App;
