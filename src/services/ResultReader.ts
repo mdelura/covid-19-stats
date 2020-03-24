@@ -1,4 +1,5 @@
 import DataResult from '../models/DataResult';
+import DayValue from '../models/DayValue';
 
 const columns = ['Province/State', 'Country/Region', 'Lat', 'Long'];
 
@@ -48,9 +49,24 @@ const getValuesFromDayOne = (dataResult: DataResult): number[] => {
     return values;
 };
 
+const getDayValues = (dataResult: DataResult): DayValue[] => {
+    const dayValues: DayValue[] = [];
+    for (const key in dataResult) {
+        if (dataResult.hasOwnProperty(key) && columns.findIndex(c => c === key) < 0) {
+            dayValues.push({
+                day: new Date(key),
+                value: parseInt(dataResult[key] as string)
+            });
+        }
+    }
+
+    return dayValues;
+};
+
 export default {
     getDays,
-    getDaysFromDayOne: getDaysFromDayOne,
+    getDaysFromDayOne,
     getValues,
-    getValuesFromDayOne
+    getValuesFromDayOne,
+    getDayValues
 };

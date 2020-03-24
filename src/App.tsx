@@ -6,15 +6,21 @@ import DataResult from './models/DataResult';
 import CenteredContent from './components/CenteredContent';
 import Container from '@material-ui/core/Container';
 import Box from '@material-ui/core/Box';
+import DataSelector from './components/DataSelector';
+import _ from 'lodash';
+
+const defaultRegions = ['Poland', 'Italy', 'Germany'];
 
 const App: React.SFC = () => {
     const [isLoading, setIsLoading] = useState(true);
-    const [data, setData] = useState<DataResult[] | undefined>(undefined);
+    const [dataResults, setDataResults] = useState<DataResult[]>([]);
+    const [selectedDataResults, setSelectedDataResults] = useState<DataResult[]>([]);
 
     useEffect(() => {
-        DataService.getData().then(data => {
-            if (!data) return;
-            setData(data);
+        DataService.getData().then(dataResults => {
+            if (!dataResults) return;
+            setDataResults(dataResults);
+            setSelectedDataResults(dataResults.filter(dr => _.includes(defaultRegions, dr['Country/Region'])));
             setIsLoading(false);
         });
     }, []);
@@ -26,12 +32,13 @@ const App: React.SFC = () => {
             </CenteredContent>
         );
 
-    if (!data) return <CenteredContent>Failed to load data</CenteredContent>;
+    if (!dataResults.length) return <CenteredContent>Failed to load data</CenteredContent>;
 
     return (
         <Container>
             <Box style={{ marginTop: 15 }}>
-                <Charts data={data} />
+                <DataSelector dataResults={dataResults} selectedResults={selectedDataResults} onChangeSelectedResults={setSelectedDataResults} />
+                <Charts dataResults={selectedDataResults} />
             </Box>
         </Container>
     );
