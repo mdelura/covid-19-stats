@@ -17,7 +17,7 @@ const DataSelector: React.SFC<DataSelectorProps> = ({ dataResults, selectedResul
             options={dataResults}
             onChange={(e, values) => onChangeSelectedResults(values)}
             value={selectedResults}
-            getOptionLabel={dr => _.compact([dr['Country/Region'], dr['Province/State']]).join(', ')}
+            getOptionLabel={dr => _.uniq(_.compact([dr['Country/Region'], dr['Province/State']])).join(', ')}
             renderInput={(params: any) => (
                 <TextField {...params} variant="outlined" label="Regions" placeholder={!selectedResults ? 'Select region' : ''} />
             )}

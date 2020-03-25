@@ -1,5 +1,6 @@
 import DataResult from '../models/DataResult';
 import DayValue from '../models/DayValue';
+import _ from 'lodash';
 
 const columns = ['Province/State', 'Country/Region', 'Lat', 'Long'];
 
@@ -53,11 +54,39 @@ const getDayValues = (dataResult: DataResult): DayValue[] => {
     const dayValues: DayValue[] = [];
     for (const key in dataResult) {
         if (dataResult.hasOwnProperty(key) && columns.findIndex(c => c === key) < 0) {
+            const value = parseInt(dataResult[key] as string);
+            const previousValue = dayValues.length ? dayValues[dayValues.length - 1].value : 0;
+            const daily = value - previousValue;
             dayValues.push({
                 day: new Date(key),
-                value: parseInt(dataResult[key] as string)
+                value,
+                daily,
+                dailyIncrease: previousValue ? daily / previousValue : 0
             });
         }
+    }
+
+    return dayValues;
+};
+
+const getEstimation = (dataResult: DataResult): DayValue[] => {
+    const lastDayValues = _.takeRight(getDayValues(dataResult), 3);
+    const averageIncrease = _.meanBy(lastDayValues, dv => dv.dailyIncrease);
+
+    const dayValues: DayValue[] = [];
+
+    for (let i = 0; i < 3; i++) {
+        const previousDayValue = i ? dayValues[i - 1] : (_.last(lastDayValues) as DayValue);
+        const daily = Math.round(previousDayValue.value * averageIncrease);
+        const day = new Date(previousDayValue.day);
+        day.setDate(day.getDate() + 1);
+
+        dayValues.push({
+            day,
+            daily,
+            dailyIncrease: averageIncrease,
+            value: previousDayValue.value + daily
+        });
     }
 
     return dayValues;
@@ -68,5 +97,6 @@ export default {
     getDaysFromDayOne,
     getValues,
     getValuesFromDayOne,
-    getDayValues
+    getDayValues,
+    getEstimation
 };
