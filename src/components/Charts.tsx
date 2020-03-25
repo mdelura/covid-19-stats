@@ -19,10 +19,10 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
             // data: dataSelector(dr)
         }));
 
-    const series = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.day.getTime(), dv.value]));
-
-    console.log(series);
-    // const seriesEst = getSeries(dr => ResultReader.getEstimation(dr).map(dv => [dv.day.getTime(), dv.value]));
+    const series = _.concat(
+        getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.day.getTime(), dv.value])),
+        getSeries(dr => ResultReader.getEstimation(dr).map(dv => [dv.day.getTime(), dv.value]))
+    );
 
     const seriesFromDayOne = getSeries(dr => ResultReader.getValuesFromDayOne(dr).map((value, index) => [index + 1, value]));
 
@@ -47,10 +47,10 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                 type="line"
                 options={{
                     title: { text: 'Total cases' },
-                    xaxis: { type: 'datetime' }
-                    // stroke: {
-                    //     dashArray: series.map((s, i) => (i / series.length > 0.5 ? 4 : 0))
-                    // }
+                    xaxis: { type: 'datetime' },
+                    stroke: {
+                        dashArray: series.map((s, i) => (i >= series.length / 2 ? 4 : 0))
+                    }
                 }}
             />
             <Chart

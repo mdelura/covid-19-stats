@@ -58,7 +58,8 @@ const getDayValues = (dataResult: DataResult): DayValue[] => {
             const previousValue = dayValues.length ? dayValues[dayValues.length - 1].value : 0;
             const daily = value - previousValue;
             dayValues.push({
-                day: new Date(key),
+                //Typo in date
+                day: new Date(key === '3/21/202' ? '3/21/20' : key),
                 value,
                 daily,
                 dailyIncrease: previousValue ? daily / previousValue : 0
@@ -73,10 +74,11 @@ const getEstimation = (dataResult: DataResult): DayValue[] => {
     const lastDayValues = _.takeRight(getDayValues(dataResult), 3);
     const averageIncrease = _.meanBy(lastDayValues, dv => dv.dailyIncrease);
 
-    const dayValues: DayValue[] = [];
+    //TODO: use lastDayValues do kroczącej estymacji
+    const dayValues: DayValue[] = [_.last(lastDayValues) as DayValue];
 
     for (let i = 0; i < 3; i++) {
-        const previousDayValue = i ? dayValues[i - 1] : (_.last(lastDayValues) as DayValue);
+        const previousDayValue = dayValues[i];
         const daily = Math.round(previousDayValue.value * averageIncrease);
         const day = new Date(previousDayValue.day);
         day.setDate(day.getDate() + 1);
