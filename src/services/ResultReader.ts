@@ -57,9 +57,11 @@ const getDayValues = (dataResult: DataResult): DayValue[] => {
             const value = parseInt(dataResult[key] as string);
             const previousValue = dayValues.length ? dayValues[dayValues.length - 1].value : 0;
             const daily = value - previousValue;
+
+            const [month, day, year] = key.split('/')
+            const date = new Date(Date.UTC(parseInt(`20${year}`), parseInt(month), parseInt(day)));
             dayValues.push({
-                //Typo in date
-                day: new Date(key === '3/21/202' ? '3/21/20' : key),
+                day: date,
                 value,
                 daily,
                 dailyIncrease: previousValue ? daily / previousValue : 0
