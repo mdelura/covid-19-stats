@@ -12,7 +12,9 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
-import { Grid } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
+import SummaryTable from './components/SummaryTable';
+import Link from '@material-ui/core/Link';
 
 const defaultRegions = ['Poland', 'Italy', 'Germany', 'United Kingdom', 'Spain'];
 
@@ -60,20 +62,29 @@ const App: React.SFC = () => {
                             />
                         </Grid>
                         <Grid item xs={3}>
-                            <FormControlLabel
+                            {/* <FormControlLabel
                                 style={{ marginLeft: 5, color: '#000' }}
                                 control={<Switch checked={showLastPeriod} onChange={(e, c) => setShowLastPeriod(c)} />}
                                 label="Show last 2 weeks"
                                 color="textSecondary"
-                            />
+                            /> */}
                         </Grid>
                     </Grid>
                 </Toolbar>
             </AppBar>
-            <Container style={{ marginTop: 5 }}>
+            <Container>
                 <Box>
-                    <Charts dataResults={selectedDataResults} showLastPeriod={showLastPeriod} />
+                    <Typography variant="h3">COVID-19 - Confirmed Cases</Typography>
+                    <Box>
+                        <SummaryTable dataResults={selectedDataResults} />
+                    </Box>
+                    <Box marginTop={2}>
+                        <Charts dataResults={selectedDataResults} showLastPeriod={showLastPeriod} />
+                    </Box>
                 </Box>
+                <Typography noWrap>
+                    Source: <Link href={DataService.dataUrl}>{DataService.dataUrl}</Link>
+                </Typography>
             </Container>
         </React.Fragment>
     );

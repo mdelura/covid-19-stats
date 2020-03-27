@@ -1,6 +1,7 @@
 import DataResult from '../models/DataResult';
 import DayValue from '../models/DayValue';
 import _ from 'lodash';
+import { getPopulation } from '../data/Population';
 
 const columns = ['Province/State', 'Country/Region', 'Lat', 'Long'];
 
@@ -52,19 +53,21 @@ const getValuesFromDayOne = (dataResult: DataResult): number[] => {
 
 const getDayValues = (dataResult: DataResult): DayValue[] => {
     const dayValues: DayValue[] = [];
+    const population = getPopulation(dataResult['Country/Region']);
     for (const key in dataResult) {
         if (dataResult.hasOwnProperty(key) && columns.findIndex(c => c === key) < 0) {
             const value = parseInt(dataResult[key] as string);
-            const previousValue = dayValues.length ? dayValues[dayValues.length - 1].value : 0;
+            const previousValue = dayValues.length ? dayValues[dayValues.length - 1].totalCases : 0;
             const daily = value - previousValue;
 
-            const [month, day, year] = key.split('/')
+            const [month, day, year] = key.split('/');
             const date = new Date(Date.UTC(parseInt(`20${year}`), parseInt(month), parseInt(day)));
             dayValues.push({
-                day: date,
-                value,
+                date: date,
+                totalCases: value,
                 daily,
-                dailyIncrease: previousValue ? daily / previousValue : 0
+                dailyIncrease: previousValue ? daily / previousValue : 0,
+                ofPopulation: population ? value / population : 0
             });
         }
     }
@@ -75,21 +78,25 @@ const getDayValues = (dataResult: DataResult): DayValue[] => {
 const getEstimation = (dataResult: DataResult): DayValue[] => {
     const lastDayValues = _.takeRight(getDayValues(dataResult), 3);
     const averageIncrease = _.meanBy(lastDayValues, dv => dv.dailyIncrease);
+    const population = getPopulation(dataResult['Country/Region']);
 
     //TODO: use lastDayValues do kroczącej estymacji
     const dayValues: DayValue[] = [_.last(lastDayValues) as DayValue];
 
     for (let i = 0; i < 3; i++) {
         const previousDayValue = dayValues[i];
-        const daily = Math.round(previousDayValue.value * averageIncrease);
-        const day = new Date(previousDayValue.day);
+        const daily = Math.round(previousDayValue.totalCases * averageIncrease);
+        const day = new Date(previousDayValue.date);
         day.setDate(day.getDate() + 1);
 
+        const value = previousDayValue.totalCases + daily;
+
         dayValues.push({
-            day,
+            date: day,
             daily,
             dailyIncrease: averageIncrease,
-            value: previousDayValue.value + daily
+            totalCases: value,
+            ofPopulation: population ? value / population : 0
         });
     }
 

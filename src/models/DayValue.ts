@@ -1,6 +1,7 @@
 export default interface DayValue {
-    day: Date;
-    value: number;
+    date: Date;
+    totalCases: number;
     daily: number;
     dailyIncrease: number;
+    ofPopulation: number;
 }

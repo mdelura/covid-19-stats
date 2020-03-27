@@ -20,8 +20,8 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
         }));
 
     const series = _.concat(
-        getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.day.getTime(), dv.value])),
-        getSeries(dr => ResultReader.getEstimation(dr).map(dv => [dv.day.getTime(), dv.value]))
+        getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.totalCases])),
+        getSeries(dr => ResultReader.getEstimation(dr).map(dv => [dv.date.getTime(), dv.totalCases]))
     );
 
     const seriesFromDayOne = getSeries(dr => ResultReader.getValuesFromDayOne(dr).map((value, index) => [index + 1, value]));
@@ -31,14 +31,16 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
         data: ResultReader.getValuesFromDayOne(dr).map((value, index) => [index + 1, value])
     }));
 
-    const dailySeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.day.getTime(), dv.daily]));
+    const dailySeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.daily]));
 
-    const dailyIncreaseSeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.day.getTime(), dv.dailyIncrease]));
+    const dailyIncreaseSeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.dailyIncrease]));
 
     const dailySeriesFromDayOne = getSeries(dr => {
         const dayValues = ResultReader.getDayValues(dr);
-        return dayValues.slice(dayValues.findIndex(dv => dv.value)).map((dv, index) => [index + 1, dv.daily]);
+        return dayValues.slice(dayValues.findIndex(dv => dv.totalCases)).map((dv, index) => [index + 1, dv.daily]);
     });
+
+    const seriesOfPopulation = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.ofPopulation]));
 
     return (
         <React.Fragment>
@@ -46,7 +48,10 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                 series={series}
                 type="line"
                 options={{
-                    title: { text: 'Total cases' },
+                    title: {
+                        text: 'Total cases',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
                     xaxis: { type: 'datetime' },
                     stroke: {
                         dashArray: series.map((s, i) => (i >= series.length / 2 ? 4 : 0))
@@ -56,7 +61,10 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
             <Chart
                 series={seriesFromDayOne}
                 options={{
-                    title: { text: 'Total cases since Day One' },
+                    title: {
+                        text: 'Total cases since Day One',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
                     xaxis: { type: 'numeric' }
                 }}
             />
@@ -64,7 +72,10 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                 series={dailySeries}
                 type="bar"
                 options={{
-                    title: { text: 'Daily cases' },
+                    title: {
+                        text: 'Daily cases',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
                     xaxis: { type: 'datetime' },
                     dataLabels: { enabled: false }
                 }}
@@ -73,7 +84,10 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                 series={dailySeriesFromDayOne}
                 type="bar"
                 options={{
-                    title: { text: 'Daily cases since Day One' },
+                    title: {
+                        text: 'Daily cases since Day One',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
                     xaxis: { type: 'numeric' },
                     dataLabels: { enabled: false }
                 }}
@@ -82,11 +96,29 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                 series={dailyIncreaseSeries}
                 type="bar"
                 options={{
-                    title: { text: 'Daily increase' },
+                    title: {
+                        text: 'Daily increase',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
                     xaxis: { type: 'datetime' },
                     stroke: { curve: 'stepline' },
                     dataLabels: { enabled: false },
                     yaxis: { labels: { formatter: (v: number) => (v * 100).toFixed() + ' %' } }
+                }}
+            />
+            <Chart
+                series={seriesOfPopulation}
+                type="line"
+                options={{
+                    title: {
+                        text: '% of population',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
+                    xaxis: { type: 'datetime' },
+                    yaxis: { labels: { formatter: (v: number) => (v * 100).toPrecision(2) + ' %' } }
+                    // stroke: {
+                    //     dashArray: series.map((s, i) => (i >= series.length / 2 ? 4 : 0))
+                    // }
                 }}
             />
             {/* TODO Add Stats + ests + vs population*/}
