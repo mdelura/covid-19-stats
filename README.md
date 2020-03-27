@@ -1,1 +1,1 @@
-Charts & stats for Sars-Cov2 spread
+Covid-19 spread stats
