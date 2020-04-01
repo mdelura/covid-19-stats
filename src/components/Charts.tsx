@@ -35,6 +35,11 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
 
     const dailyIncreaseSeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.dailyIncrease]));
 
+    const dailyIncreaseSeriesSinceDayOne = getSeries(dr => {
+        const dayValues = ResultReader.getDayValues(dr);
+        return dayValues.slice(dayValues.findIndex(dv => dv.totalCases)).map((dv, index) => [index + 1, dv.dailyIncrease]);
+    });
+
     const dailySeriesFromDayOne = getSeries(dr => {
         const dayValues = ResultReader.getDayValues(dr);
         return dayValues.slice(dayValues.findIndex(dv => dv.totalCases)).map((dv, index) => [index + 1, dv.daily]);
@@ -101,7 +106,19 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                         style: { fontSize: '18px', fontWeight: 'normal' }
                     },
                     xaxis: { type: 'datetime' },
-                    stroke: { curve: 'stepline' },
+                    dataLabels: { enabled: false },
+                    yaxis: { labels: { formatter: (v: number) => (v * 100).toFixed() + ' %' } }
+                }}
+            />
+            <Chart
+                series={dailyIncreaseSeriesSinceDayOne}
+                type="line"
+                options={{
+                    title: {
+                        text: 'Daily increase',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
+                    xaxis: { type: 'numeric' },
                     dataLabels: { enabled: false },
                     yaxis: { labels: { formatter: (v: number) => (v * 100).toFixed() + ' %' } }
                 }}
