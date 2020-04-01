@@ -70,7 +70,7 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
             />
             <Chart
                 series={dailySeries}
-                type="bar"
+                type="line"
                 options={{
                     title: {
                         text: 'Daily cases',
@@ -82,7 +82,7 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
             />
             <Chart
                 series={dailySeriesFromDayOne}
-                type="bar"
+                type="line"
                 options={{
                     title: {
                         text: 'Daily cases since Day One',
