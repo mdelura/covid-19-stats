@@ -61,7 +61,7 @@ const getDayValues = (dataResult: DataResult): DayValue[] => {
             const daily = value - previousValue;
 
             const [month, day, year] = key.split('/');
-            const date = new Date(Date.UTC(parseInt(`20${year}`), parseInt(month), parseInt(day)));
+            const date = new Date(Date.UTC(parseInt(`20${year}`), parseInt(month) - 1, parseInt(day)));
             dayValues.push({
                 date: date,
                 totalCases: value,
