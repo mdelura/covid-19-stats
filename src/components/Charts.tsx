@@ -99,7 +99,7 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
             />
             <Chart
                 series={dailyIncreaseSeries}
-                type="bar"
+                type="line"
                 options={{
                     title: {
                         text: 'Daily increase',
