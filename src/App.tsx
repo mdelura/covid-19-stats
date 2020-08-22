@@ -17,6 +17,7 @@ import SummaryTable from './components/SummaryTable';
 import Link from '@material-ui/core/Link';
 
 const defaultRegions = ['Poland', 'Italy', 'Germany', 'United Kingdom', 'Spain'];
+const regionsKey = 'regions';
 
 const App: React.SFC = () => {
     const [isLoading, setIsLoading] = useState(true);
@@ -24,16 +25,24 @@ const App: React.SFC = () => {
     const [selectedDataResults, setSelectedDataResults] = useState<DataResult[]>([]);
     const [showLastPeriod, setShowLastPeriod] = useState(false);
 
+    const handleChangeSelectedDataResults = (selectedDataResults: DataResult[]) => {
+        setSelectedDataResults(selectedDataResults);
+        localStorage.setItem(regionsKey, JSON.stringify(selectedDataResults.map((dr) => dr['Country/Region'])));
+    };
+
+    const savedRegions = localStorage.getItem(regionsKey);
+    const selectedRegions = savedRegions ? (JSON.parse(savedRegions) as string[]) : defaultRegions;
+
     useEffect(() => {
-        DataService.getDataResults().then(dataResults => {
+        DataService.getDataResults().then((dataResults) => {
             if (!dataResults) return;
             const sortedResults = _.sortBy(dataResults, ['Country/Region', 'Province/State']);
             setDataResults(sortedResults);
             setSelectedDataResults(
                 sortedResults.filter(
-                    dr =>
-                        _.includes(defaultRegions, dr['Country/Region']) &&
-                        (!dr['Province/State'] || _.includes(defaultRegions, dr['Province/State']))
+                    (dr) =>
+                        _.includes(selectedRegions, dr['Country/Region']) &&
+                        (!dr['Province/State'] || _.includes(selectedRegions, dr['Province/State']))
                 )
             );
             setIsLoading(false);
@@ -58,7 +67,7 @@ const App: React.SFC = () => {
                             <DataSelector
                                 dataResults={dataResults}
                                 selectedResults={selectedDataResults}
-                                onChangeSelectedResults={setSelectedDataResults}
+                                onChangeSelectedResults={handleChangeSelectedDataResults}
                             />
                         </Grid>
                         <Grid item xs={3}>
