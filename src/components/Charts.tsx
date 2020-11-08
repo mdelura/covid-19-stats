@@ -4,6 +4,7 @@ import Chart from 'react-apexcharts';
 import ResultReader from '../services/ResultReader';
 import DataResult from '../models/DataResult';
 import _ from 'lodash';
+import { getPopulation } from '../data/Population';
 
 export interface ChartsProps {
     dataResults: DataResult[];
@@ -24,14 +25,13 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
         getSeries(dr => ResultReader.getEstimation(dr).map(dv => [dv.date.getTime(), dv.totalCases]))
     );
 
-    const seriesFromDayOne = getSeries(dr => ResultReader.getValuesFromDayOne(dr).map((value, index) => [index + 1, value]));
-
     dataResults.map(dr => ({
         name: dr['Country/Region'],
         data: ResultReader.getValuesFromDayOne(dr).map((value, index) => [index + 1, value])
     }));
 
     const dailySeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.daily]));
+    const dailySeriesPer100k = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), Math.round(dv.daily / getPopulation(dr['Country/Region']) * 100000)]));
 
     const dailyIncreaseSeries = getSeries(dr => ResultReader.getDayValues(dr).map(dv => [dv.date.getTime(), dv.dailyIncrease]));
 
@@ -64,21 +64,23 @@ const Charts: React.SFC<ChartsProps> = ({ dataResults, showLastPeriod }) => {
                 }}
             />
             <Chart
-                series={seriesFromDayOne}
-                options={{
-                    title: {
-                        text: 'Total cases since Day One',
-                        style: { fontSize: '18px', fontWeight: 'normal' }
-                    },
-                    xaxis: { type: 'numeric' }
-                }}
-            />
-            <Chart
                 series={dailySeries}
                 type="line"
                 options={{
                     title: {
                         text: 'Daily cases',
+                        style: { fontSize: '18px', fontWeight: 'normal' }
+                    },
+                    xaxis: { type: 'datetime' },
+                    dataLabels: { enabled: false }
+                }}
+            />
+            <Chart
+                series={dailySeriesPer100k}
+                type="line"
+                options={{
+                    title: {
+                        text: 'Daily cases per 100k',
                         style: { fontSize: '18px', fontWeight: 'normal' }
                     },
                     xaxis: { type: 'datetime' },
